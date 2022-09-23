@@ -30,6 +30,7 @@ if not os.path.exists('excel'):  os.makedirs('excel')
 
 #endregion
 
+
 #region (20) Using a data source of your choice, retrieve some data:
 
 for state in statelist:
