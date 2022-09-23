@@ -56,7 +56,6 @@ for state in statelist:
     state_data = state_data[state_data['date'] < enddate]  # Get only dates before enddate
     state_data = state_data.sort_values('date', ascending=True)  # Sort by date from old to new
     state_data['str_date'] = pd.to_datetime(state_data['date'].astype(str), format='%Y%m%d')  # Add new column - date as string
-    combined['str_date'] = state_data[['str_date']]
     combined[state] = state_data[['deathIncrease']]  # Build/add column to the final combined dataframe
 
     # (10) Plot the graph
@@ -81,25 +80,18 @@ for state in statelist:
     plt.show()
 
 # Plot the final combined graph
-fig, ax = plt.subplots(1, figsize=(6.4, 4.8), constrained_layout=True)
-ax.plot(combined, label=combined.columns)
-ax.set_title('Daily Covid deaths delta in the ' + ', '.join(statelist) + ' states', fontsize=13)
-ax.set_ylabel('Covid deaths delta')
-# Major ticks every Monday, minor ticks every day,
-ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=MO))
-ax.xaxis.set_minor_locator(mdates.DayLocator())
-# Display text in the x-axis in 'yy-mmm-dd' format:
-ax.xaxis.set_major_formatter(mdates.DateFormatter('%y-%b-%d'))
-# Right-align and rotate and the x labels 30 degrees, so they don't crowd each other:
-for label in ax.get_xticklabels(which='major'):
-    label.set(rotation=30, horizontalalignment='right')
-ax.grid(True)
-filename = 'charts/Covid_Deaths_Delta_' + \
-           str(startdate)[0:4] + '-' + str(startdate)[4:6] + '-' + str(startdate)[6:8] + '_to_' + \
-           str(enddate)[0:4] + '-' + str(enddate)[4:6] + '-' + str(enddate)[6:8] + '_' + state + '.png'
-plt.savefig(filename)
+plt.plot(combined, label=combined.columns)
+title = 'Daily Covid deaths delta in the ' + ', '.join(statelist) + ' states'
+plt.title(title, fontsize=13)
+xlabel = 'Day (' + str(startdate)[0:4] + '-' + str(startdate)[4:6] + '-' + str(startdate)[6:8] + ' to ' + \
+         str(enddate)[0:4] + '-' + str(enddate)[4:6] + '-' + str(enddate)[6:8] + ')'
+plt.xlabel(xlabel)
+plt.ylabel('Covid deaths delta')
+plt.grid()
+plt.savefig('charts/Covid_Deaths_Delta_' + str(startdate) + '_to_' + str(enddate) + '_' + str(len(statelist)) + 'States.png')
 plt.legend()
 plt.show()
+
 
 
 """
