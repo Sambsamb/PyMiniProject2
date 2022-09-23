@@ -12,11 +12,14 @@ import matplotlib.pyplot as plt
 import os
 import pandas as pd
 import requests
+import datetime as dt
 #endregion
 
 #region Input and Initialize
 
 statelist = ['NJ', 'KS', 'FL', 'CA', 'NY']
+startdate = 20210101
+enddate = 20210201
 datasourceurl = 'https://api.covidtracking.com/v1/states/xx/daily.json'
 
 if not os.path.exists('charts'): os.makedirs('charts')
@@ -48,29 +51,31 @@ for state in statelist:
     state_data.to_excel(filename)
     print(f'    Saved data to {filename}')
 
-    state_data = state_data[state_data['date'] > 20200301]  # Get only dates after  3/1/2020
-    state_data = state_data[state_data['date'] < 20210302]  # Get only dates before 3/2/2021
-    state_data = state_data.sort_values('date', ascending=False)
-    state_data = state_data[['deathIncrease']]  # Get only these 1 column
+    state_data = state_data[state_data['date'] > startdate]  # Get only dates after startdate
+    state_data = state_data[state_data['date'] < enddate]  # Get only dates before enddate
+    state_data = state_data.sort_values('date', ascending=True)  # Sort by date from old to new
+    state_data['str_date'] = pd.to_datetime(state_data['date'].astype(str), format='%Y%m%d')  # Add new column - date as string
     combined[state] = state_data[['deathIncrease']]
 
     # (10) Plot the graph
-    plt.plot(state_data, label=state)
+    plt.plot(state_data[['deathIncrease']], label=state)
     title = 'Daily Covid deaths delta in the state of ' + state
     plt.title(title, fontsize=13)
-    plt.xlabel('Day (3/1/2020 to 3/1/2021)')
+    xlabel = 'Day (' + str(startdate)[0:4] + '-' + str(startdate)[4:6] + '-' + str(startdate)[6:8] + ' to ' + \
+             str(enddate)[0:4] + '-' + str(enddate)[4:6] + '-' + str(enddate)[6:8] + ')'
+    plt.xlabel(xlabel)
     plt.ylabel('Covid deaths delta')
     plt.grid()
-    plt.savefig('charts/Covid_Deaths_Delta_March2020_March2021_' + state + '.png')
+    plt.savefig('charts/Covid_Deaths_Delta_' + str(startdate) + '_to_' + str(enddate) + '_' + state + '.png')
     plt.legend()
     plt.show()
 plt.plot(combined, label=combined.columns)
 title = 'Daily Covid deaths delta in the ' + ', '.join(statelist) + ' states'
 plt.title(title, fontsize=13)
-plt.xlabel('Day (3/1/2020 to 3/1/2021)')
+plt.xlabel(xlabel)
 plt.ylabel('Covid deaths delta')
 plt.grid()
-plt.savefig('charts/Covid_Deaths_Delta_March2020_March2021_' + state + '.png')
+plt.savefig('charts/Covid_Deaths_Delta_' + str(startdate) + '_to_' + str(enddate) + '_' + str(len(statelist)) + 'States.png')
 plt.legend()
 plt.show()
 
