@@ -7,7 +7,7 @@
 >
 >9/23/2022
 > 
-This mini project collects Covid 19 data from the Covid Tracking Project APIs at https://covidtracking.com/data/api. It saves the data in Excel files. It plots the deaths delta in 5 US States during January 2021. 
+This mini project collects Covid 19 data from the Covid Tracking Project APIs at https://covidtracking.com/data/api. It saves the data in Excel files and plots the deaths delta in 5 US States during January 2021. 
 
 The packages required for main.py are in the requirements.txt file.
 
