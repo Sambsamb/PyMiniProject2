@@ -80,9 +80,9 @@ for state in statelist:
     filename = 'charts/Covid_Deaths_Delta_' + \
                str(startdate)[0:4] + '-' + str(startdate)[4:6] + '-' + str(startdate)[6:8] + '_to_' + \
                str(enddate)[0:4] + '-' + str(enddate)[4:6] + '-' + str(enddate)[6:8] + '_' + state + '.png'
+    plt.legend()
     plt.savefig(filename)
     print(f'    Saved graph to {filename}')
-    plt.legend()
     plt.show()
 
 # Plot the final combined graph
@@ -95,9 +95,9 @@ plt.xlabel(xlabel)
 plt.ylabel('Covid deaths delta')
 plt.grid()
 filename = 'charts/Covid_Deaths_Delta_' + str(startdate) + '_to_' + str(enddate) + '_' + str(len(statelist)) + 'States.png'
+plt.legend()
 plt.savefig(filename)
 print(f'    Saved combined graph to {filename}')
-plt.legend()
 plt.show()
 
 #endregion
