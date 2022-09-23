@@ -1,4 +1,4 @@
-# Mini Project 1
+# Mini Project 2
 >INF601 - Advanced Programming in Python
 > 
 >Sam Boutros
