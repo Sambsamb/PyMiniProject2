@@ -8,50 +8,82 @@ Mini Project 2
 
 
 #region (5) Proper import of packages used:
+import numpy as np
+import matplotlib.pyplot as plt
+import yfinance as yf
+import datetime as dt
+import os
 import pandas as pd
 import requests
 import json
 #endregion
 
-#region (20) Using a data source of your choice, retrieve some data, (10) Store this information in Pandas dataframe
+#region Input and Initialize
 
-# First we retrieve JSON data into a 2-dimensional dataframe
-datasourceurl = "https://opendata.fcc.gov/resource/bzun-59r8.json"
-df = pd.read_json(datasourceurl)  # <class 'pandas.core.frame.DataFrame'>
+statelist = ['NJ', 'KS', 'FL', 'CA', 'NY']
+datasourceurl = 'https://api.covidtracking.com/v1/states/xx/daily.json'
 
-# Viewing the data shows that the column labels are not user-friendly. For example:
-# for column in df.columns: print(column, end=", ")
-# Shows that column labels are:
-# hoconum, tech, d_1, d_2, d_3, d_4, d_5, d_6, d_7, d_8, u_1, u_2, u_3, u_4, u_5, u_6, u_7, u_8, u_9
-# Explanation is provided at https://opendata.fcc.gov/Wireline/Provider-Table-June-2020-Status-V2/bzun-59r8
-# So Next, I update the column names to a more user-friendly names:
-df.rename(columns={
-    "hoconum": "Provider Id",
-    "d_1": "Down200K",
-    "d_2": "Down4M",
-    "d_3": "Down10M",
-    "d_4": "Down10M",
-    "d_5": "Down100M",
-    "d_6": "Down250M",
-    "d_7": "Down500M",
-    "d_8": "Down1G",
-    "u_1": "Up200K",
-    "u_2": "Up1M",
-    "u_3": "Up3M",
-    "u_4": "Up10M",
-    "u_5": "Up25M",
-    "u_6": "Up100M",
-    "u_7": "Up250M",
-    "u_8": "Up500M",
-    "u_9": "Up1G",
-})
-
-
+if not os.path.exists('charts'):
+    os.makedirs('charts')
 
 #endregion
 
+#region (20) Using a data source of your choice, retrieve some data, (10) Store this information in Pandas dataframe
 
-# test
+for state in statelist:
+    stateurl = datasourceurl.replace('xx', state.lower())
+    print(f'Working with API URL {stateurl}')
+    # Putting in some error handling
+    try:
+        json_data = requests.get(stateurl)
+        if json_data.status_code == 200:
+            print(f'    Received API data')
+        else:
+            print(f'    Received no API data, stopping')
+            print(f'    Details: {json_data}')
+            exit(1)
+    except ValueError as ve:
+        print(f'    Error detail: {ve}')
+        exit(1)
+
+
+    state_data = pd.read_json(stateurl)
+    # df.to_excel('Covid_' + state + '.xlsx')
+
+    state_data = state_data[state_data['date'] > 20200301]  # Get only dates after  3/1/2020
+    state_data = state_data[state_data['date'] < 20210302]  # Get only dates before 3/2/2021
+    state_data.sort_values('date', ascending=False)
+    state_data = state_data[['deathIncrease']]  # Get only these 1 column
+
+    # (10) Plot the graph
+    plt.plot(state_data)
+    title = 'Daily Covid deaths delta in the state of ' + state
+    plt.title(title, fontsize=13)
+    plt.xlabel('Day (3/1/2020 to 3/1/2021)')
+    plt.ylabel('Covid deaths delta')
+    plt.grid()
+    plt.savefig('charts/Covid_Deaths_Delta_March2020_March2021_' + state + '.png')
+    plt.show()
+"""
+# Plot improvements
+    title = "Adjusted closing price of " + state + " stock in the past " + str(countOfDays) + " days"
+    plt.title(title, fontsize=13)
+    plt.xlabel('Day')
+    plt.ylabel('Price ($)')
+    plt.grid()
+# (10) Save the graph in a folder called charts as PNG file
+    plt.savefig('charts/' + state + '.png')
+    # plt.show()
+    # print()
+
+print()  # Blank line
+print("Collecting the closing price of the following", len(myStockList), "stock tickers for the last", countOfDays,
+      "trading days:")
+print()
+
+
+"""
+#endregion
 
 
 # (10) Using matplotlib, graph this data in a way that will visually represent the data
