@@ -55,21 +55,23 @@ for state in statelist:
     combined[state] = state_data[['deathIncrease']]
 
     # (10) Plot the graph
-    plt.plot(state_data)
+    plt.plot(state_data, label=state)
     title = 'Daily Covid deaths delta in the state of ' + state
     plt.title(title, fontsize=13)
     plt.xlabel('Day (3/1/2020 to 3/1/2021)')
     plt.ylabel('Covid deaths delta')
     plt.grid()
     plt.savefig('charts/Covid_Deaths_Delta_March2020_March2021_' + state + '.png')
+    plt.legend()
     plt.show()
-plt.plot(combined)
+plt.plot(combined, label=combined.columns)
 title = 'Daily Covid deaths delta in the ' + ', '.join(statelist) + ' states'
 plt.title(title, fontsize=13)
 plt.xlabel('Day (3/1/2020 to 3/1/2021)')
 plt.ylabel('Covid deaths delta')
 plt.grid()
 plt.savefig('charts/Covid_Deaths_Delta_March2020_March2021_' + state + '.png')
+plt.legend()
 plt.show()
 
 """
