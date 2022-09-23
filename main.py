@@ -8,14 +8,10 @@ Mini Project 2
 
 
 #region (5) Proper import of packages used:
-import numpy as np
 import matplotlib.pyplot as plt
-import yfinance as yf
-import datetime as dt
 import os
 import pandas as pd
 import requests
-import json
 #endregion
 
 #region Input and Initialize
@@ -23,37 +19,40 @@ import json
 statelist = ['NJ', 'KS', 'FL', 'CA', 'NY']
 datasourceurl = 'https://api.covidtracking.com/v1/states/xx/daily.json'
 
-if not os.path.exists('charts'):
-    os.makedirs('charts')
+if not os.path.exists('charts'): os.makedirs('charts')
+if not os.path.exists('excel'):  os.makedirs('excel')
 
 #endregion
 
 #region (20) Using a data source of your choice, retrieve some data, (10) Store this information in Pandas dataframe
 
+combined = pd.DataFrame()  # Empty dataframe
 for state in statelist:
     stateurl = datasourceurl.replace('xx', state.lower())
     print(f'Working with API URL {stateurl}')
     # Putting in some error handling
     try:
-        json_data = requests.get(stateurl)
-        if json_data.status_code == 200:
+        response = requests.get(stateurl)
+        if response.status_code == 200:
             print(f'    Received API data')
         else:
             print(f'    Received no API data, stopping')
-            print(f'    Details: {json_data}')
+            print(f'    Details: {response}')
             exit(1)
     except ValueError as ve:
         print(f'    Error detail: {ve}')
         exit(1)
 
-
     state_data = pd.read_json(stateurl)
-    # df.to_excel('Covid_' + state + '.xlsx')
+    filename = 'excel/covid_' + state + '.xlsx'
+    state_data.to_excel(filename)
+    print(f'    Saved data to {filename}')
 
     state_data = state_data[state_data['date'] > 20200301]  # Get only dates after  3/1/2020
     state_data = state_data[state_data['date'] < 20210302]  # Get only dates before 3/2/2021
-    state_data.sort_values('date', ascending=False)
+    state_data = state_data.sort_values('date', ascending=False)
     state_data = state_data[['deathIncrease']]  # Get only these 1 column
+    combined[state] = state_data[['deathIncrease']]
 
     # (10) Plot the graph
     plt.plot(state_data)
@@ -64,6 +63,15 @@ for state in statelist:
     plt.grid()
     plt.savefig('charts/Covid_Deaths_Delta_March2020_March2021_' + state + '.png')
     plt.show()
+plt.plot(combined)
+title = 'Daily Covid deaths delta in the ' + ', '.join(statelist) + ' states'
+plt.title(title, fontsize=13)
+plt.xlabel('Day (3/1/2020 to 3/1/2021)')
+plt.ylabel('Covid deaths delta')
+plt.grid()
+plt.savefig('charts/Covid_Deaths_Delta_March2020_March2021_' + state + '.png')
+plt.show()
+
 """
 # Plot improvements
     title = "Adjusted closing price of " + state + " stock in the past " + str(countOfDays) + " days"
