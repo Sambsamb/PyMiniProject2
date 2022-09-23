@@ -12,7 +12,8 @@ import matplotlib.pyplot as plt
 import os
 import pandas as pd
 import requests
-import datetime as dt
+import matplotlib.dates as mdates
+from matplotlib.dates import MO, TU, WE, TH, FR, SA, SU
 #endregion
 
 #region Input and Initialize
@@ -58,20 +59,39 @@ for state in statelist:
     combined[state] = state_data[['deathIncrease']]
 
     # (10) Plot the graph
-    plt.plot(state_data[['deathIncrease']], label=state)
-    title = 'Daily Covid deaths delta in the state of ' + state
-    plt.title(title, fontsize=13)
-    xlabel = 'Day (' + str(startdate)[0:4] + '-' + str(startdate)[4:6] + '-' + str(startdate)[6:8] + ' to ' + \
-             str(enddate)[0:4] + '-' + str(enddate)[4:6] + '-' + str(enddate)[6:8] + ')'
-    plt.xlabel(xlabel)
-    plt.ylabel('Covid deaths delta')
-    plt.grid()
-    plt.savefig('charts/Covid_Deaths_Delta_' + str(startdate) + '_to_' + str(enddate) + '_' + state + '.png')
-    plt.legend()
+    fig, ax = plt.subplots(1)
+    ax.plot('str_date', 'deathIncrease', data=state_data, label=state)
+    # Major ticks every Monday, minor ticks every day,
+    ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=MO))
+    ax.xaxis.set_minor_locator(mdates.DayLocator())
+    ax.grid(True)
+    ax.set_ylabel('Covid deaths delta')
+
+    ax.set_title('Daily Covid deaths delta in the state of ' + state, fontsize=13)
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%y-%b-%d'))  # Text in the x-axis will be displayed in 'yy-mmm-dd' format.
+    # Rotates and right-aligns the x labels, so they don't crowd each other.
+    for label in ax.get_xticklabels(which='major'):
+        label.set(rotation=30, horizontalalignment='right')
+
+    # plt.plot(state_data[['deathIncrease']], label=state)
+    # title = 'Daily Covid deaths delta in the state of ' + state
+    # plt.title(title, fontsize=13)
+    # plt.xlabel(xlabel)
+    # plt.ylabel('Covid deaths delta')
+    # plt.grid()
+    # plt.savefig('charts/Covid_Deaths_Delta_' + str(startdate) + '_to_' + str(enddate) + '_' + state + '.png')
+    # plt.legend()
     plt.show()
+
+
+"""
+
+exit()
 plt.plot(combined, label=combined.columns)
 title = 'Daily Covid deaths delta in the ' + ', '.join(statelist) + ' states'
 plt.title(title, fontsize=13)
+xlabel = 'Day (' + str(startdate)[0:4] + '-' + str(startdate)[4:6] + '-' + str(startdate)[6:8] + ' to ' + \
+         str(enddate)[0:4] + '-' + str(enddate)[4:6] + '-' + str(enddate)[6:8] + ')'
 plt.xlabel(xlabel)
 plt.ylabel('Covid deaths delta')
 plt.grid()
@@ -79,7 +99,7 @@ plt.savefig('charts/Covid_Deaths_Delta_' + str(startdate) + '_to_' + str(enddate
 plt.legend()
 plt.show()
 
-"""
+
 # Plot improvements
     title = "Adjusted closing price of " + state + " stock in the past " + str(countOfDays) + " days"
     plt.title(title, fontsize=13)
